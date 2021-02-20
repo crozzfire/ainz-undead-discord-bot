@@ -1,0 +1,31 @@
+{
+  "name": "ainz-undead-discord-bot",
+  "version": "1.0.0",
+  "description": "Control Ainz undead army with this",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crozzfire/ainz-undead-discord-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crozzfire/ainz-undead-discord-bot/issues"
+  },
+  "homepage": "https://github.com/crozzfire/ainz-undead-discord-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "express": "^4.17.1",
+    "lokijs": "^1.5.11",
+    "tsc": "^1.20150623.0",
+    "typescript": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.31"
+  }
+}
