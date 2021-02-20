@@ -1,4 +1,6 @@
 import { EchoAction } from './actions/echo';
+import { HelpAction } from './actions/help';
+import { SkeletonAction } from './actions/skeleton';
 
 export class BotHandler {
   private client;
@@ -10,22 +12,32 @@ export class BotHandler {
 
   public handleMessages() : void {
     this.client.on('message', message => {
-      this.handleMessage(message);
+      !message.author.bot && this.handleMessage(message);
     });
   }
 
   private handleMessage(message) {
     const data = this.getCommandData(message);
+    let response = '¯\_(ツ)_/¯';
 
-    switch (data.command?.toLowerCase()) {
+    switch (data?.command?.toLowerCase()) {
       case 'echo' :
-        const action = new EchoAction(data.command, data.args);
-        const response = action.getResponse();
-        return message.channel.send(response);
+        response = new EchoAction(data.command, data.args).getResponse();
+        break;
+
+      case 'help' :
+        response = new HelpAction(data.command, data.args).getResponse();
+        break;
+
+      case 'skeletons' :
+        response = new SkeletonAction(data.command, data.args).getResponse();
+        break;
 
       default:
-        message.channel.send('Unsupported command ¯\_(ツ)_/¯');
+        console.log(`Unsupported command ${message.content}`);
     }
+
+    message.channel.send(response);
   }
 
   private getCommandData(message) {
