@@ -12,8 +12,7 @@ client.once('ready', () => {
   console.log('Discord client is ready to serve Ainz Sama!');
 });
 
-const TOKEN = config.get('BOT_TOKEN');
-client.login(TOKEN);
+client.login(process.env.BOT_TOKEN);
 
 const handler = new BotHandler(client);
 handler.handleMessages();
