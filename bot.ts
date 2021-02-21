@@ -1,6 +1,7 @@
 import { EchoAction } from './actions/echo';
 import { HelpAction } from './actions/help';
 import { SkeletonAction } from './actions/skeleton';
+import { ArmyAction } from './actions/army';
 
 export class BotHandler {
   private client;
@@ -33,6 +34,10 @@ export class BotHandler {
         response = new SkeletonAction(data.command, data.args).getResponse();
         break;
 
+      case 'army' :
+        response = new ArmyAction(data.command, data.args).getResponse();
+        break;
+
       default:
         console.log(`Unsupported command ${message.content}`);
     }
@@ -42,8 +47,8 @@ export class BotHandler {
 
   private getCommandData(message) {
     if (message.content.startsWith(this.PREFIX)) {
-      const args = message.content.slice(this.PREFIX.length).trim().split(/ +/);
-	    const command = args.shift().toLowerCase();
+      const args = message.content.slice(this.PREFIX.length).trim().split(/ +/).map(arg => arg.toLowerCase());
+	    const command = args.shift();
 
       return { args, command };
     }

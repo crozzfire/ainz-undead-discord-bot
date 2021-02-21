@@ -1,3 +1,19 @@
 {
-  "BASE_URL": "https://ainz-undead-discord-bot-8mayb.ondigitalocean.app"
+  "BASE_URL": "https://ainz-undead-discord-bot-8mayb.ondigitalocean.app",
+  "currentArmyContains": ["skeletons"],
+  "skeletons": {
+    "defaultActiveCount": 8,
+    "maxHP": 28,
+    "actions": {
+      "shortsword": {
+        "attack": "1d20+7",
+        "hit": "1d6+6"
+      },
+      "shortbow": {
+        "attack": "1d20+7",
+        "hit": "1d6+6"
+      }
+    },
+    "defaultAction": "shortsword"
+  }
 }

@@ -1,6 +1,5 @@
 import express from 'express';
 import { BotHandler } from './bot';
-import config from 'config';
 const Discord = require('discord.js');
 const app = express();
 app.use(express.static('assets'))

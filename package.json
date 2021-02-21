@@ -22,6 +22,7 @@
     "config": "^3.3.3",
     "discord.js": "^12.5.1",
     "express": "^4.17.1",
+    "lodash": "^4.17.21",
     "lokijs": "^1.5.11",
     "rpg-dice-roller": "^4.5.2"
   },

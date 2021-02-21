@@ -3,7 +3,7 @@ import { Action } from './action';
 export class EchoAction implements Action {
   private readonly command: string;
   private readonly args : [string]  = ['Nothing to echo :/'];
-  private state;
+  private response : string;
 
   public constructor(command, args) {
     this.command = command;
@@ -11,9 +11,7 @@ export class EchoAction implements Action {
   }
 
   calculate() {
-    this.state = {
-      content: this.args.join(' ')
-    }
+    this.response = this.args.join(' ');
   }
 
   getResponse() : string {
@@ -22,6 +20,6 @@ export class EchoAction implements Action {
   }
 
   prettify() : string {
-    return this.state.content;
+    return this.response;
   }
 }

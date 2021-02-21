@@ -17,13 +17,16 @@ export class HelpAction implements Action {
     this.state = {
       content: new Discord.MessageEmbed()
       .setColor('#0099ff')
-      .setTitle('Commands supported currently')
+      .setTitle('💀 Commands 💀')
       .setDescription('List of commands currently supported')
       .addFields(
-        { name: 'Get skeletons current stats', value: '`!ainz skeletons stats`' },
-        { name: 'Set skeletons count', value: '`!ainz skeletons set count <count>`' }
+        { name: 'Get current army stats', value: '`!ainz army stats`' },
+        { name: 'Skeletons roll for attack', value: '`!ainz skeletons roll-attack <num_skeletons> <DC>`' },
+        { name: 'Skeletons roll for damage', value: '`!ainz skeletons roll-damage <action> <num_skeletons>`' },
+        { name: 'Set skeletons damage received. (Reduces HP)', value: '`!ainz skeletons set-damage-recieved <skeleton#> <damage>`' },
+        { name: 'Reset all skeletons', value: '`!ainz skeletons reset-all <optional: num_skeletons>`' }
       )
-      .setImage(`${config.get('BASE_URL')}/assets/images/skeleton.jpeg`)
+      .setImage(`${config.get('BASE_URL')}/images/skeleton.jpg`)
       .setTimestamp()
     }
   }
