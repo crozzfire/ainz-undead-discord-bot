@@ -21,12 +21,12 @@ export class HelpAction implements Action {
       .setDescription('List of commands currently supported')
       .addFields(
         { name: 'Get current army stats', value: '`!ainz army stats`' },
-        { name: 'Skeletons roll for attack', value: '`!ainz skeletons roll-attack <num_skeletons> <DC>`' },
-        { name: 'Skeletons roll for damage', value: '`!ainz skeletons roll-damage <action> <num_skeletons>`' },
-        { name: 'Set skeletons damage received. (Reduces HP)', value: '`!ainz skeletons set-damage-recieved <skeleton#> <damage>`' },
+        { name: 'Skeletons roll for attack', value: '`!ainz skeletons roll-attack <action> <DC> <optional: num_skeletons>`' },
+        { name: 'Skeletons roll for damage', value: '`!ainz skeletons roll-damage <action> <optional: num_skeletons>`' },
+        { name: 'Set skeletons damage taken (Reduces HP)', value: '`!ainz skeletons set-damage-taken <damage> <optional: skeleton#> `' },
         { name: 'Reset all skeletons', value: '`!ainz skeletons reset-all <optional: num_skeletons>`' }
       )
-      .setImage(`${config.get('BASE_URL')}/images/skeleton.jpg`)
+      .setImage(`${config.get('BASE_URL')}/images/skeleton.png`)
       .setTimestamp()
     }
   }

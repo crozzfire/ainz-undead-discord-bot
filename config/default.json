@@ -7,11 +7,11 @@
     "actions": {
       "shortsword": {
         "attack": "1d20+7",
-        "hit": "1d6+6"
+        "damage": "1d6+6"
       },
       "shortbow": {
         "attack": "1d20+7",
-        "hit": "1d6+6"
+        "damage": "1d6+6"
       }
     },
     "defaultAction": "shortsword"

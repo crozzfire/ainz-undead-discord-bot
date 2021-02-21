@@ -13,7 +13,11 @@ export class BotHandler {
 
   public handleMessages() : void {
     this.client.on('message', message => {
-      !message.author.bot && this.handleMessage(message);
+      try {
+        !message.author.bot && this.handleMessage(message);
+      } catch (err) {
+        message.channel.send = "That command killed the bot! Ask Ainz sama to help resurrect!"
+      }
     });
   }
 
