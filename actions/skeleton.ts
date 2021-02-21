@@ -13,7 +13,7 @@ export class SkeletonAction implements Action {
   private state : Skeleton[];
   private response: any = 'Unsupported sub command';
   private static readonly collectionName = 'skeletons';
-
+  private collection: any;
   public constructor(command, args) {
     this.command = command;
     this.args = args.length ? args : [''];
@@ -41,9 +41,13 @@ export class SkeletonAction implements Action {
     }
   }
 
+  reloadDB() {
+    this.collection = DB.getCollection(SkeletonAction.collectionName);
+    this.state = this.collection.find();
+  }
+
   calculate() {
-    const skeletonsCollection = DB.getCollection(SkeletonAction.collectionName);
-    this.state = skeletonsCollection.find();
+    this.reloadDB();
     const subCommand = this.args[0];
 
     switch(subCommand) {
@@ -53,16 +57,18 @@ export class SkeletonAction implements Action {
       case 'roll-attack':
         const actionAttack = this.args.length > 1 ? this.args[1] : '';
         const dc = this.args.length > 2 ? +this.args[2] : -1;
-        let numSkeletonsAttack = this.args.length > 3 ? +this.args[3] : this.state.length;
+        const numSkeletonsAttack = this.args.length > 3 ? +this.args[3] : this.state.length;
         return this.handleRollAttack(actionAttack, dc, numSkeletonsAttack);
 
       case 'roll-damage':
         const action = this.args[1];
-        let numSkeletonsDamage = this.args.length > 2 ? +this.args[2] : this.state.length;
+        const numSkeletonsDamage = this.args.length > 2 ? +this.args[2] : this.state.length;
         return this.handleRollDamage(action, numSkeletonsDamage);
 
       case 'set-damage-taken':
-        return this.handleSetDamageTaken();
+        const damage: number = this.args.length > 1 ? +this.args[1] : 0;
+        const skeletonId: number = this.args.length > 2 ? +this.args[2] : null;
+        return this.handleSetDamageTaken(damage, skeletonId);
       }
     }
 
@@ -77,19 +83,19 @@ export class SkeletonAction implements Action {
 
     const dice = config.get(`skeletons.actions.${action}.attack`);
     let totalHits = 0;
-    let result = `Rolling Attack ${dice} for ${numSkeletons} skeletons...  \n`;
+    let result = `Rolling Attack **${dice}** for **${numSkeletons}** skeletons...  \n\n`;
 
     for (let i = 0; i < numSkeletons; i++) {
       const roll = new DiceRoll(dice);
       let hasHit: boolean = (roll.total >= dc);
-      result += `*${this.state[i].nickname}* rolled ${roll.output} ${hasHit ? '[Hits]' : ['Misses']}  \n`;
+      result += `**${this.state[i].nickname}** rolled ${roll.output}   ${hasHit ? '✅' : '❌'}  \n`;
 
       if (hasHit) totalHits++;
     }
 
-    result += `*Total hits* = *${totalHits}*  \n`;
+    result += `\n**Total hits** = **${totalHits}**  \n`;
     const nextRoll = totalHits > 0 ? `!ainz skeletons roll-damage ${action} ${totalHits}` : false;
-    result += nextRoll ? '*Roll for damage:* `' + nextRoll + '`' : 'Every skeleton missed :(';
+    result += nextRoll ? '\n**Roll for damage:** `' + nextRoll + '`' : 'Every skeleton missed 😭';
 
     return this.response = new Discord.MessageEmbed()
       .setColor('#0099ff')
@@ -107,15 +113,15 @@ export class SkeletonAction implements Action {
 
     const dice = config.get(`skeletons.actions.${action}.damage`);
     let total = 0;
-    let result = `Rolling Damage ${dice} for ${numSkeletons} skeletons...  \n`;
+    let result = `Rolling Damage **${dice}** for **${numSkeletons}** skeletons...  \n\n`;
 
     for (let i = 0; i < numSkeletons; i++) {
       const roll = new DiceRoll(dice);
-      result += `*${this.state[i].nickname}* rolled ${roll.output}  \n`;
+      result += `**${this.state[i].nickname}** rolled ${roll.output}  \n`;
       total += +roll.total;
     }
 
-    result += `*Total* = *${total}*`;
+    result += `\n**Total Damage** = **${total}**`;
 
     return this.response = new Discord.MessageEmbed()
       .setColor('#0099ff')
@@ -127,8 +133,57 @@ export class SkeletonAction implements Action {
   }
 
 
-  handleSetDamageTaken() {
+  handleSetDamageTaken(damage: number = 0, skeletonSequenceNum?: number) {
+    // If skeletonSequenceNum is not provided, round-robin it
+    let shouldRoundRobinDamage = skeletonSequenceNum === null ? true : false;
+    let result = '';
+    let title = shouldRoundRobinDamage ? `💀 Applying ${damage} area damage 💀` : `Applying ${damage} damage to Skeleton #${skeletonSequenceNum} `;
 
+    if (!shouldRoundRobinDamage) {
+      const skeleton: Skeleton = this.collection.findOne({sequence: skeletonSequenceNum});
+
+      if (!skeleton) {
+        return this.response = "That skeleton is already dead!";
+      }
+
+      skeleton.currentHP -= damage;
+
+      if (skeleton.currentHP <= 0) {
+        this.collection.findAndRemove({sequence: skeleton.sequence});
+        result = `${skeleton.nickname} is DEAD! 😵`;
+      } else {
+        this.collection.update(skeleton);
+        result = `${skeleton.nickname} has taken ${damage} damage. **Current HP** = **${skeleton.currentHP}**! 😵`;
+      }
+
+    } else {
+      let damageRemaining = damage;
+      this.state.forEach(skeleton => {
+        if (!damageRemaining) return;
+
+        // If the skeleton can take all the damage
+        if (skeleton.currentHP >= damageRemaining) {
+          skeleton.currentHP -= damageRemaining;
+          result += `**${skeleton.nickname}** took ${damageRemaining} damage! **Current HP = ${skeleton.currentHP}** \n`;
+          damageRemaining = 0;
+          this.collection.update(skeleton);
+        } else {
+          damageRemaining -= skeleton.currentHP;
+          result += `**${skeleton.nickname}** took ${damageRemaining} damage and DIED! \n`;
+          this.collection.findAndRemove({sequence: skeleton.sequence});
+        }
+      })
+    }
+
+    this.reloadDB();
+
+    return this.response = new Discord.MessageEmbed()
+      .setColor('#0099ff')
+      .setTitle(title)
+      .addFields(
+        { name: "Result", value: result }
+      )
+      .setTimestamp();
   }
 
   handleResetAll() {

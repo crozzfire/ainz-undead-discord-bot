@@ -16,6 +16,7 @@ export class BotHandler {
       try {
         !message.author.bot && this.handleMessage(message);
       } catch (err) {
+        console.log("Error: ", err);
         message.channel.send = "That command killed the bot! Ask Ainz sama to help resurrect!"
       }
     });
