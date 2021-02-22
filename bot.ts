@@ -24,7 +24,7 @@ export class BotHandler {
 
   private handleMessage(message) {
     const data = this.getCommandData(message);
-    let response = '¯\_(ツ)_/¯';
+    let response = '';
 
     switch (data?.command?.toLowerCase()) {
       case 'echo' :
@@ -47,7 +47,7 @@ export class BotHandler {
         console.log(`Unsupported command ${message.content}`);
     }
 
-    message.channel.send(response);
+    response && message.channel.send(response);
   }
 
   private getCommandData(message) {
