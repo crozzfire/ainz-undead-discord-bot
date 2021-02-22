@@ -21,7 +21,9 @@ export class ArmyAction implements Action {
     const armyPopulationTypes = config.get('currentArmyContains');
     armyPopulationTypes.forEach((type: string) => {
       const collection = DB.getCollection(type);
-      this.state[type] = collection.find();
+      if (collection) {
+        this.state[type] = collection.find();
+      }
     });
 
     const subCommand = this.args[0];
